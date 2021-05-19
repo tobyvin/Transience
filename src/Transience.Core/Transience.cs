@@ -50,6 +50,7 @@ namespace Transience
                 // Extra
                 .AddSingleton(_config)
                 .AddSingleton(new LiteDatabase("bot.db"))
+                .AddSingleton<TransientHandler>()
                 // Add additional services here...
                 .BuildServiceProvider();
         }

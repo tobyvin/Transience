@@ -1,20 +1,38 @@
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 
-// Keep in mind your module **must** be public and inherit ModuleBase.
-// If it isn't, it will not be discovered by AddModulesAsync!
-// Create a module with no prefix
-public class InfoModule : ModuleBase<SocketCommandContext>
+namespace Transience.Modules
 {
-    // ~say hello world -> hello world
-    [Command("say")]
-    [Summary("Echoes a message.")]
-    public Task SayAsync([Remainder][Summary("The text to echo")] string echo)
-        => ReplyAsync(echo);
+    public class InfoModule : ModuleBase<SocketCommandContext>
+    {
+        [Command("info")]
+        [Alias("about", "whoami", "owner")]
+        public async Task InfoAsync()
+        {
+            var app = await Context.Client.GetApplicationInfoAsync();
 
-    [Command("ping")]
-    [Alias("pong", "hello")]
-    public Task PingAsync()
-        => ReplyAsync("pong!");
-    // ReplyAsync is a method on ModuleBase 
+            await ReplyAsync(
+                $"Patek is a private-use Discord bot for Discord.Net's support channels.\n\n" +
+                $"{Format.Bold("Info")}\n" +
+                $"- Author: {app.Owner} ({app.Owner.Id})\n" +
+                $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
+                $"- Runtime: {RuntimeInformation.FrameworkDescription} {RuntimeInformation.ProcessArchitecture} " +
+                    $"({RuntimeInformation.OSDescription} {RuntimeInformation.OSArchitecture})\n" +
+                $"- Uptime: {GetUptime()}\n\n" +
+
+                $"{Format.Bold("Stats")}\n" +
+                $"- Heap Size: {GetHeapSize()}MiB\n" +
+                $"- Guilds: {Context.Client.Guilds.Count}\n" +
+                $"- Channels: {Context.Client.Guilds.Sum(g => g.Channels.Count)}\n" +
+                $"- Users: {Context.Client.Guilds.Sum(g => g.Users.Count)}\n");
+        }
+
+        private static string GetUptime() => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss");
+        private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString();
+    }
 }

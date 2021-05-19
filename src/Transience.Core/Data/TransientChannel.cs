@@ -1,5 +1,3 @@
-using System;
-
 namespace Transience.Data
 {
     public class TransientChannel
